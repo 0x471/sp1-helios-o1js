@@ -1,0 +1,6 @@
+[submodule "sp1-helios"]
+	path = sp1-helios
+	url = https://github.com/0x471/sp1-helios
+[submodule "o1js-blobstream"]
+	path = o1js-blobstream
+	url = https://github.com/0x471/o1js-blobstream
