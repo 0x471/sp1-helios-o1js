@@ -1,13 +1,13 @@
 #!/bin/bash
 
+mkdir -p "$(pwd)/o1js-blobstream/scripts"
 # Navigate to the scripts folder
-cd ~/Documents/all/dev/sp1-helios-o1js/o1js-blobstream/scripts || exit
+cd $(pwd)/o1js-blobstream/scripts || exit
 
 # Set environment variables
 export WORK_DIR=run-e2e-sp1helios
 export RUN_DIR=$(pwd)/$WORK_DIR
 export PROOF_DIR=../../sp1-helios/data/proofs
-
 # Create the RUN_DIR if it does not exist
 mkdir -p "$RUN_DIR"
 
