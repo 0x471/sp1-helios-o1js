@@ -271,7 +271,7 @@ impl SP1LightClientOperator {
             // Request an update
             match self.request_update(client).await {
                 Ok(Some(proof)) => {
-                    self.relay_update(proof).await?;
+                    //self.relay_update(proof).await?;
                 }
                 Ok(None) => {
                     // Contract is up to date. Nothing to update.
