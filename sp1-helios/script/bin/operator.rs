@@ -19,7 +19,7 @@ use sp1_helios_primitives::types::ProofInputs;
 use sp1_helios_script::*;
 use sp1_sdk::{ProverClient, SP1ProofWithPublicValues, SP1ProvingKey, SP1Stdin};
 use ssz_rs::prelude::*;
-use std::env;
+use std::{env, fs, path::Path, time::{SystemTime, UNIX_EPOCH}};
 use std::sync::Arc;
 use std::time::Duration;
 use tree_hash::TreeHash;
@@ -200,6 +200,24 @@ impl SP1LightClientOperator {
 
         // Generate proof.
         let proof = self.client.prove(&self.pk, stdin).plonk().run()?;
+
+        // Create directory to save the proofs
+        let proof_path = format!("../sp1-helios-proofs");
+        let proof_dir = Path::new(&proof_path);
+        fs::create_dir_all(proof_dir)?;
+        // Get current epoch for proof file name
+        let current_time = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards");
+        let epoch = current_time.as_secs();
+        let filename = format!("{}.json", epoch);
+        let file_path = proof_dir.join(filename);
+        // Save the proof
+        std::fs::write(&file_path, serde_json::to_string(&proof).unwrap()).unwrap();
+        println!(
+            "Proof saved successfully to {}",
+            file_path.to_str().unwrap()
+        );
 
         info!("Attempting to update to new head block: {:?}", latest_block);
         Ok(Some(proof))
