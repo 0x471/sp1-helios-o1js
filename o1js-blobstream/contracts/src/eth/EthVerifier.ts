@@ -18,12 +18,12 @@ import {
   Bool,
 } from 'o1js';
 
-import { FrC } from '../towers/index';
+import { FrC } from '../towers/index.js';
 import { NodeProofLeft } from '../structs.js';
 import { parsePublicInputsProvable } from '../plonk/parse_pi.js';
 import { wordToBytes } from '../sha/utils.js';
 import fs from 'fs';
-import { PATH_TO_O1_PROOF, PATH_TO_O1_VK } from './proofs';
+import { PATH_TO_O1_PROOF, PATH_TO_O1_VK } from './proofs.js';
 
 class Bytes32 extends Bytes(32) {}
 
@@ -74,27 +74,38 @@ const EthVerifier = ZkProgram({
         Provable.log('all', input);
         Provable.log('newHeader', input.newHeader);
         Provable.log('newHead slot', input.newHead);
+        //   struct ProofOutputs {
+        //     uint256 newHead;
+        //     bytes32 prevHeader;
+        //     uint256 prevHead;
+        //     bytes32 syncCommitteeHash;
+        // }
+        let bytes: UInt8[] = [];
+        bytes = bytes.concat(input.executionStateRoot.bytes);
+        bytes = bytes.concat(input.newHeader.bytes);
+        bytes = bytes.concat(input.nextSyncCommitteeHash.bytes);
+        bytes = bytes.concat(padUInt64To32Bytes(input.newHead));
+        bytes = bytes.concat(input.prevHeader.bytes);
+        bytes = bytes.concat(padUInt64To32Bytes(input.prevHead));
+        bytes = bytes.concat(input.syncCommitteeHash.bytes);
 
-        // let bytes: UInt8[] = [];
-        // bytes = bytes.concat(input.prevHeader.bytes);
-        // bytes = bytes.concat(input.newHeader.bytes);
-        // bytes = bytes.concat(input.syncCommitteeHash.bytes);
-        // bytes = bytes.concat(input.nextSyncCommitteeHash.bytes);
-        // bytes = bytes.concat(padUInt64To32Bytes(input.prevHead)); // todo doesnt work?
-        // bytes = bytes.concat(padUInt64To32Bytes(input.newHead));
+        // bytes = bytes.concat(uint64ToBytes32(input.prevHead));
+        // bytes = bytes.concat(uint64ToBytes32(input.newHead));
 
-        // // bytes = bytes.concat(uint64ToBytes32(input.prevHead));
-        // // bytes = bytes.concat(uint64ToBytes32(input.newHead));
-        // bytes = bytes.concat(input.executionStateRoot.bytes);
+        const pi0 = ethPlonkVK;
+        const pi1 = parsePublicInputsProvable(Bytes.from(bytes));
 
-        // const pi0 = ethPlonkVK;
-        // const pi1 = parsePublicInputsProvable(Bytes.from(bytes));
+        const piDigest = Poseidon.hashPacked(Provable.Array(FrC.provable, 2), [
+          pi0,
+          pi1,
+        ]);
+        Provable.log('piDigest', piDigest);
+        Provable.log(
+          'proof.publicOutput.rightOut',
+          proof.publicOutput.rightOut
+        );
 
-        // const piDigest = Poseidon.hashPacked(Provable.Array(FrC.provable, 2), [
-        //   pi0,
-        //   pi1,
-        // ]);
-        // piDigest.assertEquals(proof.publicOutput.rightOut);
+        piDigest.assertEquals(proof.publicOutput.rightOut);
 
         return undefined;
       },

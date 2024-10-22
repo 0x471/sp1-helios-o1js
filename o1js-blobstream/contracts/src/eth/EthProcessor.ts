@@ -16,7 +16,7 @@ import {
   Undefined,
   Proof,
 } from 'o1js';
-import { EthInput, EthProof, EthVerifier, Bytes32 } from './EthVerifier';
+import { EthInput, EthProof, EthVerifier, Bytes32 } from './EthVerifier.js';
 
 export const adminPrivateKey = PrivateKey.fromBase58(
   'EKFcef5HKXAn7V2rQntLiXtJr15dkxrsrQ1G4pnYemhMEAWYbkZW'
